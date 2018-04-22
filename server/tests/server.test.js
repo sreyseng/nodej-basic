@@ -139,7 +139,7 @@ describe('DELETE /todos/:id', () => {
 
   it('should return 404 if invalid id for deletion', (done) => {
     request(app)
-      .delete(`/todos/invalidid`)
+      .delete('/todos/invalidid')
       .expect(404)
       .end(done);
   });
