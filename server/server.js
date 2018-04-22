@@ -1,5 +1,5 @@
+const _ = require('lodash');
 const { ObjectID } = require('mongodb');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -75,6 +75,34 @@ app.delete('/todos/:id', (req, res) => {
     res.status(400).send({ error: 'An unexpected error occured.' });
   });
 });
+
+app.patch('/todos/:id', (req, res) => {
+  const { id } = req.params;
+  const toUpdate = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ error: 'Invalid Id.' });
+  }
+
+  if (_.isBoolean(toUpdate.completed) && toUpdate.completed) {
+    toUpdate.completedAt = new Date().getTime();
+  } else {
+    toUpdate.completed = false;
+    toUpdate.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, { $set: toUpdate }, { new: true })
+    .then((todo) => {
+      if (!todo) {
+        return res.status(400).send('Todo not found.');
+      }
+
+      res.send({ todo });
+    }).catch((e) => {
+      res.status(400).send({ error: 'An unepected error occured.', stackTrace: e });
+    });
+});
+
 
 app.listen(port, () => {
   console.info(`Server started on port ${port}`);

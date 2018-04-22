@@ -10,7 +10,9 @@ const todosSeedData = [{
   text: 'First todo'
 }, {
   _id: new ObjectID(),
-  text: 'Second todo'
+  text: 'Second todo',
+  completed: true,
+  completedAt: 123
 }];
 
 beforeEach((done) => {
@@ -141,6 +143,41 @@ describe('DELETE /todos/:id', () => {
     request(app)
       .delete('/todos/invalidid')
       .expect(404)
+      .end(done);
+  });
+});
+
+describe('PATCH /todos/:id', () => {
+
+  it('should update the todo', (done) => {
+    const id = todosSeedData[0]._id.toHexString();
+    const body = { text: 'Updated text', completed: true };
+
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(body.text);
+        expect(res.body.todo.completed).toBeTruthy();
+        expect(res.body.todo.completedAt).toBeA('number');
+      })
+      .end(done);
+  });
+
+  it('shoud clear completed', (done) => {
+    const id = todosSeedData[1]._id.toHexString();
+    const body = { text: 'Updated text', completed: false };
+
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(body.text);
+        expect(res.body.todo.completed).toBeFalsy();
+        expect(res.body.todo.completedAt).toNotExist();
+      })
       .end(done);
   });
 });
