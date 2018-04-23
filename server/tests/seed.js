@@ -18,17 +18,22 @@ const usersSeedData = [{
   _id: test2Id,
   email: 'test2@example.com',
   password: 'test2pass',
-  tokens: []
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({ _id: test2Id, access: 'auth' }, 'supersecrettoken').toString()
+  }]
 }];
 
 const todosSeedData = [{
   _id: new ObjectID(),
-  text: 'First todo'
+  text: 'First todo',
+  _creator: test1Id
 }, {
   _id: new ObjectID(),
   text: 'Second todo',
   completed: true,
-  completedAt: 123
+  completedAt: 123,
+  _creator: test2Id
 }];
 
 const populateUsers = (done) => {
