@@ -68,6 +68,26 @@ UserSchema.statics.findByToken = function findByTokenCustomHelper(token) {
   });
 };
 
+UserSchema.statics.findByCredentials = function findByTokenCustomHelper(email, password) {
+  const User = this;
+
+  return User.findOne({ email }).then((user) => {
+    if (!user) {
+      return Promise.reject();
+    }
+
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        if (err || !res) {
+          reject(err);
+        } else {
+          resolve(user);
+        }
+      });
+    });
+  });
+};
+
 UserSchema.pre('save', function hashPasswordHelper(next) {
   const user = this;
 

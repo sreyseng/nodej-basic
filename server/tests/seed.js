@@ -18,10 +18,7 @@ const usersSeedData = [{
   _id: test2Id,
   email: 'test2@example.com',
   password: 'test2pass',
-  tokens: [{
-    access: 'auth',
-    token: jwt.sign({ _id: test2Id, access: 'auth' }, 'supersecrettoken').toString()
-  }]
+  tokens: []
 }];
 
 const todosSeedData = [{

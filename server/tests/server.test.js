@@ -218,7 +218,7 @@ describe('POST /users', () => {
           expect(user).toExist();
           expect(user.password).toNotBe(password);
           done();
-        });
+        }).catch(e => done(e));
       });
   });
 
@@ -251,5 +251,52 @@ describe('POST /users', () => {
         expect(res.body.stackTrace.code).toBe(11000); // dup key
       })
       .end(done);
+  });
+});
+
+describe('POST /users/login', () => {
+  it('should login', (done) => {
+    const { _id, email, password } = usersSeedData[1];
+    request(app)
+      .post('/users/login')
+      .send({ email, password })
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toExist();
+        expect(res.body.user._id).toEqual(_id.toHexString());
+        expect(res.body.user.email).toEqual(email);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(_id).then((user) => {
+          expect(user.tokens[0]).toInclude({
+            access: 'auth',
+            token: res.headers['x-auth']
+          });
+          done();
+        }).catch(e => done(e));
+      });
+  });
+
+  it('should fail login', (done) => {
+    const { _id, email } = usersSeedData[1];
+
+    request(app)
+      .post('/users/login')
+      .send({ email, password: 'badpass' })
+      .expect(401)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(_id).then((user) => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch(e => done(e));
+      });
   });
 });
