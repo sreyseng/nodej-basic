@@ -88,6 +88,18 @@ UserSchema.statics.findByCredentials = function findByTokenCustomHelper(email, p
   });
 };
 
+UserSchema.methods.removeToken = function removeTokenHelper(token) {
+  const user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {
+        token
+      }
+    }
+  });
+};
+
 UserSchema.pre('save', function hashPasswordHelper(next) {
   const user = this;
 
