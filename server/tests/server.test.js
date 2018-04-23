@@ -2,8 +2,9 @@ const expect = require('expect');
 const request = require('supertest');
 const { ObjectID } = require('mongodb');
 
-const { app } = require('./../server.js');
-const { Todo } = require('./../models/todo.js');
+const { app } = require('./../server');
+const { Todo } = require('./../models/todo');
+const { User } = require('./../models/user');
 const { todosSeedData, populateTodos, usersSeedData, populateUsers } = require('./seed');
 
 beforeEach(populateUsers);
@@ -165,6 +166,89 @@ describe('PATCH /todos/:id', () => {
         expect(res.body.todo.text).toBe(body.text);
         expect(res.body.todo.completed).toBeFalsy();
         expect(res.body.todo.completedAt).toNotExist();
+      })
+      .end(done);
+  });
+});
+
+describe('GET /users/me', () => {
+  it('should return user if authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .set('x-auth', usersSeedData[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.user._id).toBe(usersSeedData[0]._id.toHexString());
+        expect(res.body.user.email).toBe(usersSeedData[0].email);
+      })
+      .end(done);
+  });
+
+  it('should return 401 if not authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .expect(401)
+      .expect((res) => {
+        expect(res.body).toEqual({});
+      })
+      .end(done);
+  });
+});
+
+describe('POST /users', () => {
+  it('should create a user', (done) => {
+    const email = 'test3@noreply.com';
+    const password = 'test3pass';
+
+    request(app)
+      .post('/users')
+      .send({ email, password})
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toExist();
+        expect(res.body.user._id).toExist();
+        expect(res.body.user.email).toBe(email);
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findOne({ email }).then((user) => {
+          expect(user).toExist();
+          expect(user.password).toNotBe(password);
+          done();
+        });
+      });
+  });
+
+  it('should return errors if invalid', (done) => {
+    const email = 'invalidemail.com';
+    const password = 'test3pass';
+    const errMessage = `${email} is not a valid email`;
+
+    request(app)
+      .post('/users')
+      .send({ email, password })
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.error).toBe('Unable to save user.');
+        expect(res.body.stackTrace.errors.email.message).toBe(errMessage);
+      })
+      .end(done);
+  });
+
+  it('should not create user if email exist', (done) => {
+    const { email } = usersSeedData[0];
+    const password = 'test3pass';
+
+    request(app)
+      .post('/users')
+      .send({ email, password })
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.error).toBe('Unable to save user.');
+        expect(res.body.stackTrace.code).toBe(11000); // dup key
       })
       .end(done);
   });
