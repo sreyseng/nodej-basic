@@ -12,7 +12,7 @@ const usersSeedData = [{
   password: 'test1pass',
   tokens: [{
     access: 'auth',
-    token: jwt.sign({ _id: test1Id, access: 'auth' }, 'supersecrettoken').toString()
+    token: jwt.sign({ _id: test1Id, access: 'auth' }, process.env.JWT_SECRET).toString()
   }]
 }, {
   _id: test2Id,
@@ -20,7 +20,7 @@ const usersSeedData = [{
   password: 'test2pass',
   tokens: [{
     access: 'auth',
-    token: jwt.sign({ _id: test2Id, access: 'auth' }, 'supersecrettoken').toString()
+    token: jwt.sign({ _id: test2Id, access: 'auth' }, process.env.JWT_SECRET).toString()
   }]
 }];
 
