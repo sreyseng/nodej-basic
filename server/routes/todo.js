@@ -29,6 +29,10 @@ router.get('/', authenticate, (req, res) => {
   });
 });
 
+router.get('/ping', (req, res) => {
+  res.send({ body: 'pong' });
+});
+
 router.get('/:id', authenticate, (req, res) => {
   const { id } = req.params;
 

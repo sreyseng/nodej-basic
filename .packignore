@@ -1,0 +1,6 @@
+playground/*
+server/tests/*
+server/config/config.json
+server/server.local.js
+package.json
+package-lock.json
