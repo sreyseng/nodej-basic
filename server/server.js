@@ -34,6 +34,10 @@ app.use((req, res, next) => {
 app.use('/todos', todoRouter);
 app.use('/users', userRouter);
 
+app.get('/ping', (req, res) => {
+  res.send({ body: 'pong' });
+});
+
 module.exports = {
   app
 };
