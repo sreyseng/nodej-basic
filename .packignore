@@ -3,3 +3,4 @@ server/tests/*
 server/config/config.json
 server/server.local.js
 package-lock.json
+dist/**
