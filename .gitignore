@@ -2,3 +2,4 @@ node_modules/
 playground/
 server.log
 server/config/config.json
+dist/
