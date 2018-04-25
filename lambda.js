@@ -7,7 +7,6 @@ const { app } = require('./server/server');
 // binaryMimeTypes below, then redeploy (`npm run package-deploy`)
 const binaryMimeTypes = [
   'application/javascript',
-  'application/json',
   'application/octet-stream',
   'application/xml',
   'font/eot',
