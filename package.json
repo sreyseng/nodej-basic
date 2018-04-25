@@ -10,8 +10,9 @@
     "build": "pack-zip",
     "generate-dist": "echo 'todo-api.zip' | xargs perl ~/bin/packageHelper.pl",
     "pre-package": "npm run build && npm run generate-dist",
-    "package": "sam package --template-file ~/sam/todo-api/sam.yaml --s3-bucket todo-api --output-template-file ~/sam/todo-api/packaged.yaml",
-    "deploy": "aws cloudformation deploy --template-file ~/sam/todo-api/packaged.yaml --stack-name todoDev --capabilities CAPABILITY_IAM"
+    "aws-package": "sam package --template-file ~/sam/todo-api/sam.yaml --s3-bucket todo-api --output-template-file ~/sam/todo-api/packaged.yaml",
+    "aws-deploy": "aws cloudformation deploy --template-file ~/sam/todo-api/packaged.yaml --stack-name todoDev --capabilities CAPABILITY_IAM",
+    "deploy": "npm run pre-package && npm run aws-package && npm run aws-deploy" 
   },
   "engines": {
     "node": "6.2.2"

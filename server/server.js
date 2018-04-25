@@ -10,6 +10,7 @@ const awsServerlessExpressMiddleware = require('aws-serverless-express/middlewar
 
 const todoRouter = require('./routes/todo');
 const userRouter = require('./routes/user');
+const errorHandler = require('./middleware/default404');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 
 app.use('/todos', todoRouter);
 app.use('/users', userRouter);
+app.use('/*', errorHandler);
 
 app.get('/ping', (req, res) => {
   res.send({ body: 'pong' });
